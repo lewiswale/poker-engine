@@ -57,4 +57,12 @@ public class GameEngine {
     public List<Card> getDeck() {
         return deck;
     }
+
+    public List<Card> getHand() {
+        List<Card> hand = new ArrayList<>();
+        hand.add(deck.get(0));
+        hand.add(deck.get(1));
+
+        return hand;
+    }
 }
