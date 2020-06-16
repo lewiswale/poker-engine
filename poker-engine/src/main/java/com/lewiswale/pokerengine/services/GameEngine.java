@@ -1,6 +1,8 @@
 package com.lewiswale.pokerengine.services;
 
 import com.lewiswale.pokerengine.model.Card;
+import com.lewiswale.pokerengine.model.GameState;
+import com.lewiswale.pokerengine.model.Player;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,12 +12,17 @@ import java.util.Random;
 @Service
 public class GameEngine {
     private static final int DECK_SIZE = 52;
+    private static final int MAX_PLAYER_COUNT = 8;
 
     private List<Card> deck;
+    private List<Player> players;
     private Random r;
+    private int deckPosition = 0;
 
     public GameEngine() {
+        players = new ArrayList<>();
         initDeck();
+        shuffleDeck();
     }
 
     private void initDeck() {
@@ -58,11 +65,33 @@ public class GameEngine {
         return deck;
     }
 
-    public List<Card> getHand() {
-        List<Card> hand = new ArrayList<>();
-        hand.add(deck.get(0));
-        hand.add(deck.get(1));
+    public Card drawCard() {
+        if (deckPosition == DECK_SIZE) {
+            shuffleDeck();
+            deckPosition = 0;
+        }
 
-        return hand;
+        Card toReturn = deck.get(deckPosition);
+        deckPosition++;
+
+        return toReturn;
+    }
+
+    public GameState getHand(int playerId) {
+        Player player = players.get(playerId);
+        player.setPlayerHand(new ArrayList<>());
+        player.getPlayerHand().add(drawCard());
+        player.getPlayerHand().add(drawCard());
+
+        return new GameState(player, players.size());
+    }
+
+    public GameState addPlayer() {
+        Player player = new Player(players.size());
+        players.add(player);
+        player.getPlayerHand().add(drawCard());
+        player.getPlayerHand().add(drawCard());
+
+        return new GameState(player, players.size());
     }
 }
